@@ -1,0 +1,51 @@
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+nav {
+    background-color: #cecece;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-item a {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: black;
+}
+
+.nav-item:hover {
+    background-color: #e4e4e4;
+}
+
+.nav-item:hover a {
+    color: #5e94ae;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+form {
+    padding: 1rem;
+}
