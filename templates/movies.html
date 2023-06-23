@@ -5,8 +5,37 @@
 
 {% block content %}
 
+{% if user is defined and user != null and user.role == 'admin' %}
+<div class="mx-2 mt-2 text-center">
+    <h3> Click the button bellow to fetch new movies! </h3>
+    <p> Use this only the first time in order to fetch movies </p>
+    <button type="button" id="fetch-movies" class="btn btn-primary btn-lg" data-url="{{ url('movies_fetch') }}">Fetch Movies</button>
+</div>
+{% endif %}
+
+<div class="container-fluid mt-5 mx-2">
+    <h3> Now Playing </h3>
+    {% for movieData in moviesData %}
+        <div class="d-flex flex-row mb-3">
+            {% for movie in movieData %}
+                <div class="card mx-2" style="width: 18rem;">
+                    <img src="https://image.tmdb.org/t/p/w500/{{ movie.imageUrlId }}" class="card-img-top" alt="{{ movie.name }} Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.name }}
+                            <a id="edit-movie" href="{{ url('movies_edit', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-pencil text-primary mx-1"> </a>
+                            <a id="delete-movie" data-href="{{ url('movies_delete', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-trash text-danger mx-1"></a>
+                        </h5>
+                        <p class="card-text">{{ movie.description }}</p>
+                    </div>
+                    <a href="/reservation" class="btn btn-primary">Book now!</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
 
 {% endblock %}
 
 {% block script %}
+    <script src="/movies.js"></script>
 {% endblock %}

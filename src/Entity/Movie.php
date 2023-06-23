@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MovieRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Movie
 {
     #[ORM\Id]
@@ -34,14 +35,17 @@ class Movie
     #[ORM\Column(length: 255)]
     private ?string $director = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::FLOAT)]
     private ?int $rating = null;
 
-    #[ORM\Column(length: 16)]
-    private ?string $duration_in_minutes = null;
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $duration_in_minutes = null;
+
+    #[ORM\Column(length: 1024)]
+    private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $description = null;
+    private ?string $image_url_id = null;
 
     #[ORM\OneToMany(mappedBy: 'movie_id', targetEntity: Reservation::class)]
     private Collection $reservations;
@@ -61,9 +65,11 @@ class Movie
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    #[ORM\PrePersist]
+    public function setCreatedAt(): static
     {
-        $this->created_at = $created_at;
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
 
         return $this;
     }
@@ -73,9 +79,10 @@ class Movie
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    #[ORM\PreUpdate]
+    public function setUpdatedAt(): static
     {
-        $this->updated_at = $updated_at;
+        $this->updated_at = new \DateTimeImmutable();
 
         return $this;
     }
@@ -133,19 +140,19 @@ class Movie
         return $this->rating;
     }
 
-    public function setRating(int $rating): static
+    public function setRating(float $rating): static
     {
         $this->rating = $rating;
 
         return $this;
     }
 
-    public function getDurationInMinutes(): ?string
+    public function getDurationInMinutes(): ?int
     {
         return $this->duration_in_minutes;
     }
 
-    public function setDurationInMinutes(string $duration_in_minutes): static
+    public function setDurationInMinutes(int $duration_in_minutes): static
     {
         $this->duration_in_minutes = $duration_in_minutes;
 
@@ -160,6 +167,18 @@ class Movie
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getImageUrlId(): ?string
+    {
+        return $this->image_url_id;
+    }
+
+    public function setImageUrlId(string $image_url_id): static
+    {
+        $this->image_url_id = $image_url_id;
 
         return $this;
     }
