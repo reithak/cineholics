@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -52,6 +54,14 @@ class User implements UserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $approved_at = null;
+
+    #[ORM\ManyToMany(targetEntity: Reservation::class, mappedBy: 'user')]
+    private Collection $reservations;
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -217,5 +227,32 @@ class User implements UserInterface
     public function getUserIdentifier(): string
     {
         return $this->username;
+    }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            $reservation->removeUser($this);
+        }
+
+        return $this;
     }
 }

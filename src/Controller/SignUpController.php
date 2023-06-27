@@ -24,6 +24,10 @@ class SignUpController extends AbstractController
     #[Route('/sign-up', methods: ['GET', 'POST'])]
     public function index(Request $request, EntityManagerInterface $entityManager, HttpClientInterface $httpClient): Response
     {
+        if ($request->getSession()->get('user_id')) {
+            return $this->redirectToRoute('app_front_index');
+        }
+
         $response = $httpClient->request(
             'GET',
             'https://countriesnow.space/api/v0.1/countries'

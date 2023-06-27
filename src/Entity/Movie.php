@@ -38,6 +38,9 @@ class Movie
     #[ORM\Column(type: Types::FLOAT)]
     private ?int $rating = null;
 
+    #[ORM\Column(type: Types::FLOAT)]
+    private ?int $price = null;
+
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $duration_in_minutes = null;
 
@@ -47,12 +50,16 @@ class Movie
     #[ORM\Column(length: 255)]
     private ?string $image_url_id = null;
 
-    #[ORM\OneToMany(mappedBy: 'movie_id', targetEntity: Reservation::class)]
+    #[ORM\OneToMany(mappedBy: 'movie', targetEntity: Reservation::class)]
     private Collection $reservations;
+
+    #[ORM\ManyToMany(targetEntity: Seat::class, mappedBy: 'movie', cascade: ['all'], orphanRemoval: true,)]
+    private Collection $seats;
 
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
+        $this->seats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -147,6 +154,18 @@ class Movie
         return $this;
     }
 
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
     public function getDurationInMinutes(): ?int
     {
         return $this->duration_in_minutes;
@@ -195,7 +214,7 @@ class Movie
     {
         if (!$this->reservations->contains($reservation)) {
             $this->reservations->add($reservation);
-            $reservation->setMovieId($this);
+            $reservation->setMovie($this);
         }
 
         return $this;
@@ -205,9 +224,36 @@ class Movie
     {
         if ($this->reservations->removeElement($reservation)) {
             // set the owning side to null (unless already changed)
-            if ($reservation->getMovieId() === $this) {
-                $reservation->setMovieId(null);
+            if ($reservation->getMovie() === $this) {
+                $reservation->setMovie(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Seat>
+     */
+    public function getSeats(): Collection
+    {
+        return $this->seats;
+    }
+
+    public function addSeat(Seat $seat): static
+    {
+        if (!$this->seats->contains($seat)) {
+            $this->seats->add($seat);
+            $seat->addMovie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeat(Seat $seat): static
+    {
+        if ($this->seats->removeElement($seat)) {
+            $seat->removeMovie($this);
         }
 
         return $this;

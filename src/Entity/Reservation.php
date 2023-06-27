@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\ReservationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Reservation
 {
     #[ORM\Id]
@@ -36,7 +40,21 @@ class Reservation
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Movie $movie_id = null;
+    private ?Movie $movie = null;
+
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'reservations')]
+    private Collection $user;
+
+    #[ORM\Column(length: 128)]
+    private ?string $schedule = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $attendance_date = null;
+
+    public function __construct()
+    {
+        $this->user = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -60,9 +78,11 @@ class Reservation
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    #[ORM\PrePersist]
+    public function setCreatedAt(): static
     {
-        $this->created_at = $created_at;
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
 
         return $this;
     }
@@ -72,9 +92,10 @@ class Reservation
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    #[ORM\PreUpdate]
+    public function setUpdatedAt(): static
     {
-        $this->updated_at = $updated_at;
+        $this->updated_at = new \DateTimeImmutable();
 
         return $this;
     }
@@ -127,14 +148,62 @@ class Reservation
         return $this;
     }
 
-    public function getMovieId(): ?Movie
+    public function getMovie(): ?Movie
     {
-        return $this->movie_id;
+        return $this->movie;
     }
 
-    public function setMovieId(?Movie $movie_id): static
+    public function setMovie(?Movie $movie): static
     {
-        $this->movie_id = $movie_id;
+        $this->movie = $movie;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUser(): Collection
+    {
+        return $this->user;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->user->contains($user)) {
+            $this->user->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->user->removeElement($user);
+
+        return $this;
+    }
+
+    public function getSchedule(): ?string
+    {
+        return $this->schedule;
+    }
+
+    public function setSchedule(string $schedule): static
+    {
+        $this->schedule = $schedule;
+
+        return $this;
+    }
+
+    public function getAttendanceDate(): ?\DateTimeInterface
+    {
+        return $this->attendance_date;
+    }
+
+    public function setAttendanceDate(\DateTimeInterface $attendance_date): static
+    {
+        $this->attendance_date = $attendance_date;
 
         return $this;
     }

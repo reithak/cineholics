@@ -1,7 +1,6 @@
 const fetchButton = document.querySelector('#fetch-movies');
-const deleteMovieButton = document.querySelector('#delete-movie');
-const editMovieButton = document.querySelector('#edit-movie');
-const bookMovieButton = document.querySelector('#book-movie');
+const deleteMovieButtons = document.querySelectorAll('.delete-movie');
+const bookMovieButtons = document.querySelectorAll('.book-movie');
 
 if (fetchButton) {
     fetchButton.onclick = function (event) {
@@ -19,41 +18,45 @@ if (fetchButton) {
     }
 }
 
-if (deleteMovieButton) {
-    deleteMovieButton.onclick = function (event) {
+deleteMovieButtons.forEach((deleteMovieButton)=> {
+    deleteMovieButton.addEventListener('click', function (event) {
         let button = event.target;
-    
-        fetch(button.dataset.href, {
-            method: "DELETE"
-        })
-        .then(res => res.json())
-        .then(response => {
-            location.reload();
-        })
-        .catch(err => {
-        });
-    }
-}
 
-if (editMovieButton) {
-    editMovieButton.onclick = function (event) {
-        let button = event.target;
-    
-        fetch(button.dataset.href, {
-            method: "GET"
+        Swal.fire({
+            title: 'Caution!',
+            text: 'Are you sure you want to delete this movie?',
+            icon: 'warning',
+            denyButtonText: 'No go back!',
+            confirmButtonText: 'Yes!',
+            showDenyButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(button.dataset.href, {
+                    method: "DELETE"
+                })
+                .then(res => res.json())
+                .then(response => {
+                    if (response.errors.length) {
+                        response.errors.forEach((error)=> {
+                            Swal.fire(
+                                'Warning!',
+                                error,
+                                'warning'
+                            )
+                        });
+                    } else {
+                        location.reload();
+                    }
+                })
+                .catch(err => {
+                });
+            }
         })
-        .then(res => res.json())
-        .then(response => {
-            location.reload();
-        })
-        .catch(err => {
-        });
-    }
-}
+    });
+});
 
-if (bookMovieButton) {
-    console.log(bookMovieButton)
-    bookMovieButton.onclick = function (event) {
+bookMovieButtons.forEach((bookMovieButton)=> {
+    bookMovieButton.addEventListener('click', function (event) {
         let button = event.target;
         
         if (button.getAttribute('disabled')) {
@@ -66,9 +69,9 @@ if (bookMovieButton) {
                 if (result.isConfirmed) {
                     window.location = button.dataset.redirect_href;
                 }
-            });
+            })
         } else {
             window.location = button.dataset.href;
         }
-    }
-}
+    });
+});

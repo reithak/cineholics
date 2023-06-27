@@ -11,10 +11,6 @@
 
             <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4"> Book {{ movie.name }} ({{ movie.year }}) </p>
 
-            {% if not availableSeats %}
-                <p class="text-center text-danger fw-bold mb-5 mx-1 mx-md-4 mt-4">No Available Tickets for {{ movie.name }} ({{ movie.year }}) </p>
-            {% endif %}
-
             <form class="mx-1 mx-md-4" method="POST">
                 <div class="container-md text-center">
                     <img src="https://image.tmdb.org/t/p/w500/{{ movie.imageUrlId }}" alt="{{ movie.name }} Image">
@@ -48,18 +44,16 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                    <a href="/movies"><button type="button" class="btn btn-secondary btn-lg mx-1">Back</button></a>
-                    {% if not availableSeats %}
-                        <button type="button" class="btn btn-info btn-lg mx-1">Sold Out</button>
-                        {% else %}
-                        <button type="submit" class="btn btn-success btn-lg mx-1">Book <span>{{ movie.price }}</span>&euro; / Person </button>
-                    {% endif %}
+                <div class="d-flex flex-row align-items-center mb-4 hidden">
+                    <div class="form-outline flex-fill mb-0 mx-1">
+                      {{ form_row(form.status) }}
+                    </div>
                 </div>
 
-                {% if not availableSeats %}
-                    <p class="text-center text-danger fw-bold mb-5 mx-1 mx-md-4 mt-4">No Available Tickets for {{ movie.name }} ({{ movie.year }}) </p>
-                {% endif %}
+                <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                    <a href="/movies"><button type="button" class="btn btn-secondary btn-lg mx-1">Back</button></a>
+                    <button type="submit" class="btn btn-success btn-lg mx-1">Update </button>
+                </div>
 
             </form>
   

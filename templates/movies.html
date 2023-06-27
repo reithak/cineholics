@@ -21,15 +21,23 @@
                 <div class="card mx-2" style="width: 18rem;">
                     <img src="https://image.tmdb.org/t/p/w500/{{ movie.imageUrlId }}" class="card-img-top" alt="{{ movie.name }} Image">
                     <div class="card-body">
-                        <h5 class="card-title">{{ movie.name }}
-                            {% if user is defined and user != null and user.role == 'admin' %}
-                                <a id="edit-movie" href="{{ url('movies_edit', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-pencil text-primary mx-1"> </a>
-                                <a id="delete-movie" data-href="{{ url('movies_delete', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-trash text-danger mx-1"></a>
-                            {% endif %}
-                        </h5>
+                        <h5 class="card-title"> {{ movie.name }} ({{ movie.year }})</h5>
+                        <div><span> <i class="fa fa-star text-warning"></i> {{ movie.rating }} / 10</span></div>
                         <p class="card-text">{{ movie.description }}</p>
+                        {% if user is defined and user != null and user.role == 'admin' %}
+                            <div>
+                                <div>
+                                    <label>Edit</label>
+                                    <a href="{{ url('movies_edit', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-pencil text-primary mx-1 edit-movie"> </a>
+                                </div>
+                                <div>
+                                    <label>Delete</label>
+                                    <a data-href="{{ url('movies_delete', {movieId: movie.id}) }}" style="text-decoration: none; cursor: pointer;" class="fa-solid fa-trash text-danger mx-1 delete-movie"></a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
-                    <a id="book-movie" data-href="/book-movie/{{ movie.id }}" data-redirect_href="/sign-in" class="btn btn-primary" {% if user is not defined or user == null %} disabled="true" {% endif %}>Book now!</a>
+                    <a data-href="/book-movie/{{ movie.id }}" data-redirect_href="/sign-in" class="btn btn-primary book-movie {% if not movie.seats.count %} not-available {% endif %}" {% if user is not defined or user == null %} disabled="true" {% endif %}>Book now!</a>
                 </div>
             {% endfor %}
         </div>

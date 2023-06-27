@@ -21,7 +21,6 @@
             <ul class="nav-links">
                 <li class="nav-item"><a href="/">Home</a></li>
                 {% if user is defined and user != null and user.role == 'admin' %}
-                    <li class="nav-item"><a href="/admin/dashboard">Admin Dashboard</a></li>
                     <li class="nav-item"><a href="/admin/users">Users</a></li>
                 {% endif %}
 

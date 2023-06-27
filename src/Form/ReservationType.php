@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Reservation;
+use Doctrine\DBAL\Types\DateType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,30 +15,18 @@ class ReservationType extends AbstractType
     {
         $builder
             ->add('customer_name')
-            ->add('created_at')
-            ->add('updated_at')
-            ->add('first_seat_number')
-            ->add('last_seat_number')
-            ->add('price')
+            ->add('attendance_date')
             ->add('status');
 
-        $seatLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-        $seatNumbers = range(1, 20);
+        $seatNumbers = range(1, 100);
 
-        $seats = [];
+        $schedules = [
+            'Evening Schedule (18:00)' => 'Evening Schedule (18:00)',
+            'Night Schedule (21:00)' => 'Night Schedule (21:00)',
+        ];
 
-        foreach ($seatLetters as $seatLetter) {
-            foreach ($seatNumbers as $seatNumber) {
-                $seats["{$seatLetter} - {$seatNumber}"] = "{$seatLetter} - {$seatNumber}";
-            }
-        }
-
-        $builder->add('first_seat_number', ChoiceType::class, [
-            'choices'  => $seats,
-        ]);
-
-        $builder->add('last_seat_number', ChoiceType::class, [
-            'choices'  => $seats,
+        $builder->add('schedule', ChoiceType::class, [
+            'choices'  => $schedules,
         ]);
     }
 

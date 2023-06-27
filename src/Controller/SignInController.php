@@ -21,9 +21,15 @@ class SignInController extends AbstractController
     #[Route('/sign-in', methods: ['GET', 'POST'], name: 'sign-in')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if ($request->getSession()->get('user_id')) {
+            return $this->redirectToRoute('app_front_index');
+        }
+
         $form = $this->createForm(SignInFormType::class);
         $form->handleRequest($request);
         $passwordVerified = true;
+
+        $resultMessages = [];
 
         if ($form->isSubmitted() && $form->isValid()) {
 
@@ -35,7 +41,8 @@ class SignInController extends AbstractController
             if ($user) {
                 $passwordVerified = password_verify($password, $user->getPassword());
 
-                if ($passwordVerified) {
+                if ($passwordVerified && $user->getApprovedAt()) {
+
                     $request->getSession()->set('user_id', $user->getId());
 
                     return $this->redirectToRoute('app_front_index');
@@ -43,13 +50,19 @@ class SignInController extends AbstractController
             } else {
                 $passwordVerified = false;
             }
+
+            if (!$user->getApprovedAt()) {
+                $resultMessages[] = 'User is not yet approved, please try again later.';
+            }
         }
 
-        $resultMessage = !$passwordVerified ? "Username/Password combination is wrong." : null;
+        if (!$passwordVerified) {
+            $resultMessages[] = "Username/Password combination is wrong.";
+        }
 
         return $this->render('sign-in.html', [
             'form' => $form,
-            'resultMessage' => $resultMessage,
+            'resultMessages' => $resultMessages,
         ]);
     }
 }

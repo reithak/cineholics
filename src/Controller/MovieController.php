@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Movie;
+use App\Entity\Reservation;
+use App\Entity\Seat;
 use App\Entity\User;
 use App\Form\MovieType;
 use DateTime;
@@ -58,10 +60,11 @@ class MovieController extends AbstractController
     public function fetch(Request $request, EntityManagerInterface $entityManager, HttpClientInterface $httpClient): Response
     {
         $movieEntityClass = Movie::class;
+        $seatEntityClass = Seat::class;
 
-        $query = $entityManager->createQuery("DELETE FROM {$movieEntityClass}");
+        $result = $entityManager->createQuery("DELETE FROM {$movieEntityClass}")->getResult();
 
-        $result = $query->getResult();
+        $result = $entityManager->createQuery("DELETE FROM {$seatEntityClass}")->getResult();
 
         $response = new Response();
 
@@ -95,9 +98,18 @@ class MovieController extends AbstractController
                 ->setDurationInMinutes($movieDetails['runtime'])
                 ->setYear($releaseDate->format('Y'))
                 ->setGenre($movieDetails['genres']['0']['name'])
-                ->setImageUrlId($movieData['poster_path']);
+                ->setImageUrlId($movieData['poster_path'])
+                ->setPrice(7);
 
             $entityManager->persist($movie);
+
+            foreach (range(1, 50) as $seatNumber) {
+                $seat = new Seat();
+
+                $seat->addMovie($movie)->setAvailable(true)->setSeatNumber((string)$seatNumber);
+
+                $entityManager->persist($seat);
+            }
         }
 
         $entityManager->flush();
@@ -142,14 +154,22 @@ class MovieController extends AbstractController
 
         $params = $request->attributes->get('_route_params');
 
+        $errors = [];
+
         $moviedId = $params['movieId'];
 
         $movie = $entityManager->getRepository(Movie::class)->find($moviedId);
 
-        $entityManager->remove($movie);
+        $reservation = $entityManager->getRepository(Reservation::class)->findOneBy(['movie' => $moviedId]);
 
-        $entityManager->flush();
+        if ($reservation) {
+            $errors[] = 'You cannot delete this because there are reservations for this movie!';
+        } else {
+            $entityManager->remove($movie);
 
-        return $response->setContent(json_encode([]));
+            $entityManager->flush();
+        }
+
+        return $response->setContent(json_encode(['errors' => $errors]));
     }
 }
