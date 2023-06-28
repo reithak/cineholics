@@ -1,4 +1,5 @@
 const fetchButton = document.querySelector('#fetch-movies');
+const applyFiltersButton = document.querySelector('#apply-filters');
 const deleteMovieButtons = document.querySelectorAll('.delete-movie');
 const bookMovieButtons = document.querySelectorAll('.book-movie');
 
@@ -15,6 +16,28 @@ if (fetchButton) {
         })
         .catch(err => {
         });
+    }
+}
+
+if (applyFiltersButton) {
+    applyFiltersButton.onclick = function (event) {
+        let button = event.target;
+
+        let genreFilter = document.querySelector('[name="genre"]');
+        let yearFilter = document.querySelector('[name="year"]');
+        let movieNameFilter = document.querySelector('[name="movie-name"]');
+
+        const params = new URLSearchParams({
+            genre: genreFilter.value,
+            year: yearFilter.value,
+            movieName: movieNameFilter.value,
+        });
+
+        const regex = /\?.*/i;
+
+        url = window.location.href.replace(regex, '');
+
+        window.location = url + "?" + params.toString();
     }
 }
 

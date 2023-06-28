@@ -30,7 +30,23 @@ class MovieController extends AbstractController
 
         $user = $userId ? $entityManager->getRepository(User::class)->find($userId) : null;
 
-        $movies = $entityManager->getRepository(Movie::class)->findAll();
+        parse_str($request->getQueryString() ?: '', $queryParams);
+
+        $moviesQb = $entityManager->getRepository(Movie::class)->createQueryBuilder('movie');
+
+        if (!empty($queryParams['genre']) && $queryParams['genre'] !== 'all') {
+            $moviesQb->andWhere('movie.genre = :genre')->setParameter('genre', $queryParams['genre']);
+        }
+
+        if (!empty($queryParams['year'])) {
+            $moviesQb->andWhere('movie.year = :year')->setParameter('year', $queryParams['year']);
+        }
+
+        if (!empty($queryParams['movieName'])) {
+            $moviesQb->andWhere('movie.name LIKE :name')->setParameter('name', "%{$queryParams['movieName']}%");
+        }
+
+        $movies = $moviesQb->getQuery()->getResult();
 
         $count = 0;
 
@@ -53,7 +69,7 @@ class MovieController extends AbstractController
             $moviesData[] = $moviesPerRow;
         }
 
-        return $this->render('movies.html', ['moviesData' => $moviesData, 'user' => $user]);
+        return $this->render('movies.html', ['moviesData' => $moviesData, 'user' => $user, 'queryParams' => $queryParams]);
     }
 
     #[Route('/movies/fetch', methods: ['GET'], name: 'movies_fetch')]
@@ -141,7 +157,6 @@ class MovieController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute('movies');
-        } else {
         }
 
         return $this->render('edit-movie.html', ['movie' => $movie, 'user' => $user, 'form' => $form]);
