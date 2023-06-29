@@ -38,6 +38,8 @@ class SignInController extends AbstractController
 
             $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
 
+            $hasUsers = $entityManager->getRepository(User::class)->findOneBy([]);
+
             if ($user) {
                 $passwordVerified = password_verify($password, $user->getPassword());
 
@@ -51,7 +53,7 @@ class SignInController extends AbstractController
                 $passwordVerified = false;
             }
 
-            if (!$user->getApprovedAt()) {
+            if ($hasUsers && !$user->getApprovedAt()) {
                 $resultMessages[] = 'User is not yet approved, please try again later.';
             }
         }

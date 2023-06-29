@@ -18,7 +18,25 @@ class ReservationType extends AbstractType
             ->add('attendance_date')
             ->add('status');
 
-        $seatNumbers = range(1, 100);
+        $freeSeats = [];
+
+        $entityManager = $options['entityManager'];
+
+        $availableSeats = $options['availableSeats'];
+
+        foreach ($availableSeats as $availableSeat) {
+            $freeSeats[$availableSeat->getSeatNumber()] = $availableSeat->getSeatNumber();
+        }
+
+        $builder->add('first_seat_number', ChoiceType::class, [
+            'choices' => $freeSeats,
+            'required' => true,
+        ]);
+
+        $builder->add('last_seat_number', ChoiceType::class, [
+            'choices' => $freeSeats,
+            'required' => true,
+        ]);
 
         $schedules = [
             'Evening Schedule (18:00)' => 'Evening Schedule (18:00)',
@@ -36,5 +54,8 @@ class ReservationType extends AbstractType
             'data_class' => Reservation::class,
             'csrf_protection' => false,
         ]);
+
+        $resolver->setRequired('entityManager');
+        $resolver->setRequired('availableSeats');
     }
 }

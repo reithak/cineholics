@@ -51,7 +51,7 @@
                 <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                     <a href="/movies"><button type="button" class="btn btn-secondary btn-lg mx-1">Back</button></a>
                     {% if not availableSeats %}
-                        <button type="button" class="btn btn-info btn-lg mx-1">Sold Out</button>
+                        <button type="button" class="btn btn-danger btn-lg mx-1">Sold Out</button>
                         {% else %}
                         <button type="submit" class="btn btn-success btn-lg mx-1">Book <span>{{ movie.price }}</span>&euro; / Person </button>
                     {% endif %}

@@ -88,6 +88,8 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $formUser->setApprovedAt(new DateTimeImmutable());
 
+            $formUser->setPassword(password_hash($formUser->getPassword(), PASSWORD_BCRYPT));
+
             $entityManager->persist($formUser);
             $entityManager->flush();
 

@@ -20,30 +20,30 @@
         <div class="p-2">
             <h4> Genre </h4>
             <select class="form-select" name="genre">
-                <option {% if queryParams.genre == 'all' %}  selected {% endif %} value="all">All</option>
-                <option {% if queryParams.genre == 'Action' %}  selected {% endif %} value="Action">Action</option>
-                <option {% if queryParams.genre == 'Animation' %}  selected {% endif %} value="Animation">Animation</option>
-                <option {% if queryParams.genre == 'Science' %}  selected {% endif %} value="Science Fiction">Science Fiction</option>
-                <option {% if queryParams.genre == 'Horror' %}  selected {% endif %} value="Horror">Horror</option>
-                <option {% if queryParams.genre == 'War' %}  selected {% endif %} value="War">War</option>
-                <option {% if queryParams.genre == 'Mystery' %}  selected {% endif %} value="Mystery">Mystery</option>
-                <option {% if queryParams.genre == 'Adventure' %}  selected {% endif %} value="Adventure">Adventure</option>
-                <option {% if queryParams.genre == 'Thriller' %}  selected {% endif %} value="Thriller">Thriller</option>
-                <option {% if queryParams.genre == 'Comedy' %}  selected {% endif %} value="Comedy">Comedy</option>
+                <option {% if queryParams and queryParams.genre == 'all' %}  selected {% endif %} value="all">All</option>
+                <option {% if queryParams and queryParams.genre == 'Action' %}  selected {% endif %} value="Action">Action</option>
+                <option {% if queryParams and queryParams.genre == 'Animation' %}  selected {% endif %} value="Animation">Animation</option>
+                <option {% if queryParams and queryParams.genre == 'Science' %}  selected {% endif %} value="Science Fiction">Science Fiction</option>
+                <option {% if queryParams and queryParams.genre == 'Horror' %}  selected {% endif %} value="Horror">Horror</option>
+                <option {% if queryParams and queryParams.genre == 'War' %}  selected {% endif %} value="War">War</option>
+                <option {% if queryParams and queryParams.genre == 'Mystery' %}  selected {% endif %} value="Mystery">Mystery</option>
+                <option {% if queryParams and queryParams.genre == 'Adventure' %}  selected {% endif %} value="Adventure">Adventure</option>
+                <option {% if queryParams and queryParams.genre == 'Thriller' %}  selected {% endif %} value="Thriller">Thriller</option>
+                <option {% if queryParams and queryParams.genre == 'Comedy' %}  selected {% endif %} value="Comedy">Comedy</option>
             </select>
         </div>
         <div class="p-2">
             <h4> Year </h4>
             <select class="form-select" name="year">
-                <option {% if queryParams.year == '2020' %} selected {% endif %} value="2020">2020</option>
-                <option {% if queryParams.year == '2021' %} selected {% endif %} value="2021">2021</option>
-                <option {% if queryParams.year == '2022' %} selected {% endif %} value="2022">2022</option>
-                <option {% if queryParams.year == '2023' %} selected {% endif %} value="2023">2023</option>
+                <option {% if queryParams and queryParams.year == '2020' %} selected {% endif %} value="2020">2020</option>
+                <option {% if queryParams and queryParams.year == '2021' %} selected {% endif %} value="2021">2021</option>
+                <option {% if queryParams and queryParams.year == '2022' %} selected {% endif %} value="2022">2022</option>
+                <option {% if queryParams and queryParams.year == '2023' %} selected {% endif %} value="2023">2023</option>
             </select>
         </div>
         <div class="p-2">
             <h4> Movie Name </h4>
-            <input type="text" class="form-control" name="movie-name" placeholder="Search for a movie by name" value="{{ queryParams.movieName }}"/>
+            <input type="text" class="form-control" name="movie-name" placeholder="Search for a movie by name" {% if queryParams and queryParams.movieName %} value="{{ queryParams.movieName }}" {% endif %}/>
         </div>
         <div class="p-2">
             <h4>&nbsp;</h4>

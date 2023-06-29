@@ -30,7 +30,11 @@ class ReservationController extends AbstractController
 
         $user = $userId ? $entityManager->getRepository(User::class)->find($userId) : null;
 
-        $reservations = $user ? $user->getReservations() : [];
+        if ($user && $user->getRole() === 'admin') {
+            $reservations = $entityManager->getRepository(Reservation::class)->findAll();
+        } else {
+            $reservations = $user ? $user->getReservations() : [];
+        }
 
         return $this->render('reservations.html', ['user' => $user, 'reservations' => $reservations]);
     }
@@ -50,37 +54,22 @@ class ReservationController extends AbstractController
 
         $reservation = new Reservation();
 
-        $form = $this->createForm(ReservationType::class, $reservation);
+        $availableSeats = $entityManager->getRepository(Seat::class)
+            ->createQueryBuilder('seat')
+            ->join('seat.movie', 'movie')
+            ->where('movie = :movie')
+            ->andWhere('seat.available = :available')
+            ->setParameter('movie', $movie)
+            ->setParameter('available', true)
+            ->getQuery()
+            ->getResult();
+
+        $form = $this->createForm(ReservationType::class, $reservation, [
+            'entityManager' => $entityManager,
+            'availableSeats' => $availableSeats,
+        ]);
 
         $form->handleRequest($request);
-
-        if ($request->getMethod() === 'GET') {
-            $freeSeats = [];
-
-            $availableSeats = $entityManager->getRepository(Seat::class)
-                ->createQueryBuilder('seat')
-                ->join('seat.movie', 'movie')
-                ->where('movie = :movie')
-                ->andWhere('seat.available = :available')
-                ->setParameter('movie', $movie)
-                ->setParameter('available', true)
-                ->getQuery()
-                ->getResult();
-
-            foreach ($availableSeats as $availableSeat) {
-                $freeSeats[$availableSeat->getSeatNumber()] = $availableSeat->getSeatNumber();
-            }
-
-            $form->add('first_seat_number', ChoiceType::class, [
-                'choices'  => $freeSeats,
-                'required' => true,
-            ]);
-
-            $form->add('last_seat_number', ChoiceType::class, [
-                'choices'  => $freeSeats,
-                'required' => true,
-            ]);
-        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $reservation = $form->getData();
@@ -128,9 +117,22 @@ class ReservationController extends AbstractController
 
         $reservation = $entityManager->getRepository(Reservation::class)->find($reservationId);
 
-        $form = $this->createForm(ReservationType::class, $reservation);
-
         $movie = $reservation->getMovie();
+
+        $availableSeats = $entityManager->getRepository(Seat::class)
+            ->createQueryBuilder('seat')
+            ->join('seat.movie', 'movie')
+            ->where('movie = :movie')
+            ->andWhere('seat.available = :available')
+            ->setParameter('movie', $movie)
+            ->setParameter('available', true)
+            ->getQuery()
+            ->getResult();
+
+        $form = $this->createForm(ReservationType::class, $reservation, [
+            'entityManager' => $entityManager,
+            'availableSeats' => $availableSeats,
+        ]);
 
         $form->handleRequest($request);
 
