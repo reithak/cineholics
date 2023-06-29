@@ -36,7 +36,7 @@
                     </div>
   
                     <div class="d-flex flex-row align-items-center mb-4">
-                      <div class="form-outline flex-fill mb-0 mx-1">
+                      <div id="country-container" class="form-outline flex-fill mb-0 mx-1" data-url="{{ url('fetch_cities', {country: 'country'}) }}">
                         {{ form_row(form.country) }}
                       </div>
                       <div class="form-outline flex-fill mb-0 mx-1">
@@ -71,5 +71,5 @@
 {% endblock %}
 
 {% block script %}
-    <script src="/movies.js"></script>
+    <script src="/users.js"></script>
 {% endblock %}

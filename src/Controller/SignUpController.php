@@ -35,22 +35,12 @@ class SignUpController extends AbstractController
 
         $countriesData = $response->toArray();
 
-        $response = $httpClient->request(
-            'POST',
-            'https://countriesnow.space/api/v0.1/countries/cities',
-            ['body' => ['country' => 'greece']]
-        );
-
-        $citiesData = $response->toArray();
-
-        foreach ($citiesData['data'] as $city) {
-            $cities[$city] = $city;
-        }
-
         $user = new User();
         $form = $this->createForm(SignUpFormType::class, $user);
 
         $countries = [];
+
+        $countries['None'] = 'None';
 
         foreach ($countriesData['data'] as $countryData) {
             $countries[$countryData['country']] = $countryData['country'];
@@ -61,7 +51,7 @@ class SignUpController extends AbstractController
         ]);
 
         $form->add('city', ChoiceType::class, [
-            'choices'  => $cities,
+            'choices'  => [],
         ]);
 
         $form->handleRequest($request);
@@ -82,5 +72,29 @@ class SignUpController extends AbstractController
         return $this->render('sign-up.html', [
             'form' => $form,
         ]);
+    }
+
+    #[Route('/fetch-cities/{country}', methods: ['GET'], name: 'fetch_cities')]
+    public function fetchCities(Request $request, EntityManagerInterface $entityManager, HttpClientInterface $httpClient): Response
+    {
+        $params = $request->attributes->get('_route_params');
+
+        $country = $params['country'];
+
+        $response = $httpClient->request(
+            'POST',
+            'https://countriesnow.space/api/v0.1/countries/cities',
+            ['body' => ['country' => $country]]
+        );
+
+        $citiesData = $response->toArray();
+
+        $cities = [];
+
+        foreach ($citiesData['data'] as $city) {
+            $cities[$city] = $city;
+        }
+
+        return new Response(json_encode($cities));
     }
 }
