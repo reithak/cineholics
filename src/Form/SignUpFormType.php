@@ -10,6 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SignUpFormType extends AbstractType
@@ -29,7 +31,15 @@ class SignUpFormType extends AbstractType
                 'required' => true,
                 'first_options'  => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat your Password'],
-            ]);
+            ])->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                $form = $event->getForm();
+
+                $city = $event->getData()['city'];
+
+                if ($city) {
+                    $form->add('city', ChoiceType::class, ['choices' => [$city => $city]]);
+                }
+            });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

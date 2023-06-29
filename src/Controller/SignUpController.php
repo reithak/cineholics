@@ -10,6 +10,8 @@ use App\Form\SignUpFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -50,9 +52,7 @@ class SignUpController extends AbstractController
             'choices'  => $countries,
         ]);
 
-        $form->add('city', ChoiceType::class, [
-            'choices'  => [],
-        ]);
+        $form->add('city', ChoiceType::class);
 
         $form->handleRequest($request);
 
